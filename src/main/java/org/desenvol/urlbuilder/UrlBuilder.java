@@ -3,6 +3,7 @@ package org.desenvol.urlbuilder;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
@@ -14,13 +15,21 @@ import java.util.List;
  */
 public class UrlBuilder {
 
+	private boolean isProtocolRelative = false;
+
 	private String schema;
 
 	private String host;
 
-	private String port;
+	private Integer port;
 
 	private String base;
+
+	private String user;
+
+	private String password;
+
+	private String fragment;
 
 	private List<NameValuePair> queryParams = new ArrayList<>();
 
@@ -39,6 +48,17 @@ public class UrlBuilder {
 		return this;
 	}
 
+	/**
+	 * Will prepend <code>//</code> without schema
+	 * 
+	 * @return
+	 */
+	public UrlBuilder protocolRelative() {
+		this.isProtocolRelative = true;
+		this.schema = null;
+		return this;
+	}
+
 	public UrlBuilder base(String base) {
 		this.base = base;
 		return this;
@@ -49,13 +69,28 @@ public class UrlBuilder {
 		return this;
 	}
 
-	public UrlBuilder port(String port) {
+	public UrlBuilder port(Integer port) {
 		this.port = port;
+		return this;
+	}
+
+	public UrlBuilder user(String user) {
+		this.user = user;
+		return this;
+	}
+
+	public UrlBuilder pasword(String password) {
+		this.password = password;
 		return this;
 	}
 
 	public UrlBuilder path(String path) {
 		paths.add(path);
+		return this;
+	}
+
+	public UrlBuilder fragment(String fragment) {
+		this.fragment = fragment;
 		return this;
 	}
 
@@ -84,24 +119,52 @@ public class UrlBuilder {
 		return schema;
 	}
 
+	public boolean isProtocolRelative() {
+		return isProtocolRelative;
+	}
+
 	public String getHost() {
 		return host;
 	}
 
-	public String getPort() {
+	/**
+	 * Returns the specified port
+	 * 
+	 * @return the port
+	 */
+	public Integer getPort() {
 		return port;
 	}
 
+	/**
+	 * Returns the specified base
+	 * 
+	 * @return the base
+	 */
 	public String getBase() {
 		return base;
 	}
 
+	/**
+	 * Returns the immutable list of paths
+	 * 
+	 * @return paths as an immutable list
+	 */
 	public List<String> getPaths() {
-		return paths;
+		return Collections.unmodifiableList(paths);
 	}
 
+	/**
+	 * Returns the immutable list of query parameters
+	 * 
+	 * @return query parameters as an immutable list
+	 */
 	public List<NameValuePair> getQueryParams() {
-		return queryParams;
+		return Collections.unmodifiableList(queryParams);
+	}
+
+	public String getFragment() {
+		return fragment;
 	}
 
 	public String build() {
@@ -112,7 +175,22 @@ public class UrlBuilder {
 		} else {
 			if (schema != null) {
 				builder.append(schema);
-				builder.append("://");
+				builder.append(':');
+			}
+
+			if (schema != null || isProtocolRelative) {
+				builder.append("//");
+			}
+
+			if (user != null || password != null) {
+				if (user != null) {
+					builder.append(user);
+				}
+				if (password != null) {
+					builder.append(':');
+					builder.append(password);
+				}
+				builder.append('@');
 			}
 
 			if (host != null) {
@@ -142,6 +220,11 @@ public class UrlBuilder {
 				nameValuePair = iterator.next();
 				appendParam(builder, nameValuePair);
 			}
+		}
+
+		if (fragment != null) {
+			builder.append('#');
+			builder.append(fragment);
 		}
 
 		return builder.toString();
