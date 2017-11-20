@@ -70,6 +70,16 @@ public class UrlBuilder {
 		return this;
 	}
 
+	/**
+	 * Adds a query parameter without a value.
+	 * 
+	 * @param port
+	 * @return
+	 */
+	public UrlBuilder param(String name) {
+		return param(name, null);
+	}
+
 	public String getSchema() {
 		return schema;
 	}
@@ -126,28 +136,28 @@ public class UrlBuilder {
 			builder.append('?');
 			Iterator<NameValuePair> iterator = queryParams.iterator();
 			NameValuePair nameValuePair = iterator.next();
-			builder.append(nameValuePair.getName());
+			appendParam(builder, nameValuePair);
+			while (iterator.hasNext()) {
+				builder.append('&');
+				nameValuePair = iterator.next();
+				appendParam(builder, nameValuePair);
+			}
+		}
+
+		return builder.toString();
+
+	}
+
+	private void appendParam(StringBuilder builder, NameValuePair nameValuePair) {
+		builder.append(nameValuePair.getName());
+		if (nameValuePair.getValue() != null) {
 			builder.append('=');
 			try {
 				builder.append(URLEncoder.encode(nameValuePair.getValue(), "UTF8"));
 			} catch (UnsupportedEncodingException e) {
 				throw new RuntimeException(e);
 			}
-			while (iterator.hasNext()) {
-				builder.append('&');
-				nameValuePair = iterator.next();
-				builder.append(nameValuePair.getName());
-				builder.append('=');
-				try {
-					builder.append(URLEncoder.encode(nameValuePair.getValue(), "UTF8"));
-				} catch (UnsupportedEncodingException e) {
-					throw new RuntimeException(e);
-				}
-			}
 		}
-
-		return builder.toString();
-
 	}
 
 	/**
