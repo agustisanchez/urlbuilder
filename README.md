@@ -19,16 +19,16 @@ A simple Java API to build URL strings with a fluid syntax and zero dependencies
    String url = new UrlBuilder("http://foo.net")
                         .path("test")
                         .param("simpleParam", "1/2")
-				        .param("multipleValuesParam", "first", "second")
-				        .param("noValueParam")
-				        .fragment("fragment")
-				        .build();
+                        .param("multiValueParam", "first", "second")
+                        .param("noValueParam")
+                        .fragment("fragment")
+                        .build();
 ```
 
 returns:
 
 ```
-   http://foo.net/test?simpleParam=1%2F2&multipleValuesParam=first&multipleValuesParam=second&noValueParam#fragment
+   http://foo.net/test?simpleParam=1%2F2&multiValueParam=first&multiValueParam=second&noValueParam#fragment
 ```
 
  
