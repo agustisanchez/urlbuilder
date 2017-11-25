@@ -1,5 +1,8 @@
 package org.desenvol.urlbuilder;
 
+import java.net.URI;
+import java.net.URISyntaxException;
+
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -15,10 +18,23 @@ import org.junit.runners.JUnit4;
 public class UrlBuilderTest {
 
 	@Test
-	public void someBasicTest() {
-		String url = new UrlBuilder("http://expressjava.net").path("test").param("someParam", "1/2").param("novalue")
-				.param("anotherParam", "other").fragment("fragment").build();
-		Assert.assertEquals("http://expressjava.net/test?someParam=1%2F2&novalue&anotherParam=other#fragment", url);
+	public void testReturnString() {
+		String url = new UrlBuilder("http://foo.net").path("test").param("simpleParam", "1/2")
+				.param("multipleValuesParam", "first", "second").param("noValueParam").fragment("fragment").build();
+		Assert.assertEquals(
+				"http://foo.net/test?simpleParam=1%2F2&multipleValuesParam=first&multipleValuesParam=second&noValueParam#fragment",
+				url);
+	}
+
+	@Test
+	public void testReturnURI() throws URISyntaxException {
+		URI uri = new UrlBuilder("http://foo.net").path("test").param("simpleParam", "1/2")
+				.param("multipleValuesParam", "first", "second").param("noValueParam").fragment("fragment")
+				.buildAsUri();
+		Assert.assertEquals(
+				"http://foo.net/test?simpleParam=1%2F2&multipleValuesParam=first&multipleValuesParam=second&noValueParam#fragment",
+				uri.toString());
+
 	}
 
 	@Test

@@ -1,6 +1,8 @@
 package org.desenvol.urlbuilder;
 
 import java.io.UnsupportedEncodingException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -100,19 +102,15 @@ public class UrlBuilder {
 	 * @param port
 	 * @return
 	 */
-	public UrlBuilder param(String name, String value) {
-		queryParams.add(new NameValuePair(name, value));
+	public UrlBuilder param(String name, String... values) {
+		if (values == null || values.length == 0) {
+			queryParams.add(new NameValuePair(name, null));
+		} else {
+			for (String value : values) {
+				queryParams.add(new NameValuePair(name, value));
+			}
+		}
 		return this;
-	}
-
-	/**
-	 * Adds a query parameter without a value.
-	 * 
-	 * @param port
-	 * @return
-	 */
-	public UrlBuilder param(String name) {
-		return param(name, null);
 	}
 
 	public String getSchema() {
@@ -167,6 +165,11 @@ public class UrlBuilder {
 		return fragment;
 	}
 
+	/**
+	 * Creates the URL as a {@link String} object.
+	 * 
+	 * @return the built URS as a <code>String</code> object
+	 */
 	public String build() {
 
 		StringBuilder builder = new StringBuilder();
@@ -229,6 +232,16 @@ public class UrlBuilder {
 
 		return builder.toString();
 
+	}
+
+	/**
+	 * Creates the URL as a {@link URI} object.
+	 * 
+	 * @throws URISyntaxException 
+	 * @return the built URS as a <code>String</code> object
+	 */
+	public URI buildAsUri() throws URISyntaxException {
+		return new URI(build());
 	}
 
 	private void appendParam(StringBuilder builder, NameValuePair nameValuePair) {
